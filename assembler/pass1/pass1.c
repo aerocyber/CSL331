@@ -23,7 +23,8 @@ int main()
 
     if (strcmp(opcode, "START") == 0)
     {
-        printf("[DEBUG]: %X %s %s %s\n", locctr, label, opcode, operand);
+        printf("[DEBUG]: - %s %s %s\n", label, opcode, operand);
+        fprintf(inter, "- %s %s %s\n", label, opcode, operand);
         locctr = strtol(operand, NULL, 16);
         start = locctr;
         fscanf(src, "%s %s %s", label, opcode, operand);
@@ -62,11 +63,15 @@ int main()
             printf("[INFO ]: Symtab updated\n");
         }
 
-        rewind(optab);
+        printf("[DEBUG]: %X %s %s %s\n", locctr, label, opcode, operand);
+        fprintf(inter, "%X %s %s %s\n", locctr, label, opcode, operand);
+
         opcode_fnd = 0;
+        rewind(optab);
         fscanf(optab, "%s %s", optab_opcode, optab_addr);
         while (!feof(optab))
         {
+            printf("[DEBUG]: Comparing %s %s\n", opcode, optab_opcode);
             if (strcmp(opcode, optab_opcode) == 0)
             {
                 printf("[INFO ]: Opcode found\n");
@@ -74,6 +79,11 @@ int main()
                 break;
             }
             fscanf(optab, "%s %s", optab_opcode, optab_addr);
+        }
+        if (strcmp(opcode, optab_opcode) == 0 && opcode_fnd == 0)
+        {
+            printf("[INFO ]: Opcode found\n");
+            opcode_fnd = 1;
         }
 
         if (opcode_fnd == 1)
@@ -98,12 +108,10 @@ int main()
         }
         else
         {
-            printf("[ERROR]: Duplicate symbol\n");
+            printf("[ERROR]: Invalid opcode: %s\n", opcode);
             exit(1);
         }
 
-        printf("[DEBUG]: %X %s %s %s\n", locctr, label, opcode, operand);
-        fprintf(inter, "%X %s %s %s\n", locctr, label, opcode, operand);
         fscanf(src, "%s %s %s", label, opcode, operand);
     }
     printf("[INFO ]: Out of main loop\n");
